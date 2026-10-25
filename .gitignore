@@ -1,0 +1,11 @@
+/obj/
+/bin/
+/.vs/
+/Private/
+/Production/
+*.user
+*.pdb
+*.cab
+*.sys
+*.cat
+*.inf
