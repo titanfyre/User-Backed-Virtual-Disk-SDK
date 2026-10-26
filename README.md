@@ -1,4 +1,4 @@
-# User-Backed Virtual Disk SDK - Windows Kernel Block Device Driver
+# User-Backed Virtual Disk SDK - Microsoft-signed Windows Kernel Block Device Driver
 
 **Serve a real Windows virtual disk from your own C++ storage backend.**
 
@@ -9,10 +9,7 @@ adapters; the included providers use RAM or a regular local image file.
 
 ![Native application in labelled offline preview mode](docs/app.png)
 
-**Engineering preview, Windows x64.** Public downloads contain the native app,
-CLI, SDK, examples and installer source. Microsoft signing is pending. No
-unsigned/test-signed driver, lab certificate or installable setup executable is
-included. See [validation and boundaries](docs/VALIDATION.md).
+**Microsoft-signed evaluation, Windows x64.** The complete 0.1.1 ZIP contains the native application, CLI, C++ example, SDK, installer sources and self-contained UI/console installers with the signed 0.1.0.0 driver. Actual installation, storage operations and removal passed Windows 10 x64 campaigns normally and under targeted Driver Verifier, with test-signing disabled. See [validation and boundaries](docs/VALIDATION.md).
 
 ## Scope
 
@@ -43,9 +40,9 @@ FUA/DPO and VERIFY commands, are refused rather than silently ignored.
 
 ## Run
 
-1. Download the [complete preview ZIP](https://github.com/titanfyre/User-Backed-Virtual-Disk-SDK/releases), extract it and launch `UserBackedDisk.exe --preview` for an offline tour. The labelled preview never opens a driver or backend.
-2. Request evaluation access from **`titancsa` on Discord**. After the returned Microsoft-signed package is qualified, an installable bundle will include self-contained UI and console setups.
-3. With that signed bundle, run `UserBackedDiskSetup.exe`, choose **Install / reinstall** and restart only if requested. Installation creates the adapter; it does not create or format a disk.
+1. Download the [complete signed ZIP](https://github.com/titanfyre/User-Backed-Virtual-Disk-SDK/releases/tag/v0.1.1), extract it and launch `UserBackedDisk.exe --preview` for an offline tour. The labelled preview never opens a driver or backend.
+2. Request a User-Backed Virtual Disk SDK access key from **`titancsa` on Discord**. The ZIP includes both self-contained setups; Windows test-signing is not required.
+3. Run `UserBackedDiskSetup.exe`, choose **Install / reinstall** and restart only if requested. Installation creates the adapter; it does not create or format a disk.
 4. Run the application as administrator. Choose **Memory**, a capacity and whether the virtual disk is read only. Paste the product key and choose **Authorize & create**. Creation is explicit; it does not run at app startup.
 5. For an image backend, choose **Regular image file** and its path. The existing file must have exactly the selected size. **Create a new image** uses a new filename and refuses overwriting an existing file. The file provider requires a local fixed volume and rejects device, UNC and reparse paths.
 6. Keep the provider running while using its exact Titan virtual disk. **Renew access** renews the permission without replacing the backend. **Stop** or app closure makes that virtual disk unavailable. Save and close its users, then flush and dismount its exact volume before stopping a formatted disk. The SDK does not perform a filesystem dismount for you.

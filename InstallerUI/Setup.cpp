@@ -59,16 +59,28 @@ bool CatalogMember(const fs::path& directory,const wchar_t* name){
     WINTRUST_DATA data{};data.cbStruct=sizeof(data);data.dwUIChoice=WTD_UI_NONE;data.dwUnionChoice=WTD_CHOICE_CATALOG;data.pCatalog=&member;data.dwStateAction=WTD_STATEACTION_VERIFY;data.dwProvFlags=WTD_CACHE_ONLY_URL_RETRIEVAL|WTD_REVOCATION_CHECK_NONE;
     GUID action=WINTRUST_ACTION_GENERIC_VERIFY_V2;LONG result=WinVerifyTrust(nullptr,&action,&data);data.dwStateAction=WTD_STATEACTION_CLOSE;WinVerifyTrust(nullptr,&action,&data);return result==ERROR_SUCCESS;
 }
+bool OwnServiceBinary(const fs::path& inf,const wchar_t* binary){
+    if(!_wcsicmp(binary,L".\\TitanUserBackedDisk.sys")||!_wcsicmp(binary,L"%13%\\TitanUserBackedDisk.sys"))return true;
+    // Published OEM INFs expand DIRID 13 to their exact Driver Store folder.
+    // Resolve that INF's store location rather than accepting arbitrary paths.
+    wchar_t stored[MAX_PATH]{};
+    if(!SetupGetInfDriverStoreLocationW(inf.c_str(),nullptr,nullptr,stored,MAX_PATH,nullptr))return false;
+    const auto expected=fs::path(stored).parent_path()/L"TitanUserBackedDisk.sys";
+    return !_wcsicmp(binary,expected.c_str());
+}
 bool OwnPackage(const fs::path& path){
+    // Resolve published OEM names before parsing DIRID substitutions. Parsing
+    // the Windows INF copy directly can expand DIRID 13 to system32\unknown.
+    wchar_t stored[MAX_PATH]{};
+    const auto source=SetupGetInfDriverStoreLocationW(path.c_str(),nullptr,nullptr,stored,MAX_PATH,nullptr)?fs::path(stored):path;
     GUID classId{};wchar_t className[128]{};
-    if(!SetupDiGetINFClassW(path.c_str(),&classId,className,128,nullptr)||!IsEqualGUID(classId,GUID_DEVCLASS_SCSIADAPTER))return false;
-    HINF inf=SetupOpenInfFileW(path.c_str(),nullptr,INF_STYLE_WIN4,nullptr);if(inf==INVALID_HANDLE_VALUE)return false;
+    if(!SetupDiGetINFClassW(source.c_str(),&classId,className,128,nullptr)||!IsEqualGUID(classId,GUID_DEVCLASS_SCSIADAPTER))return false;
+    HINF inf=SetupOpenInfFileW(source.c_str(),nullptr,INF_STYLE_WIN4,nullptr);if(inf==INVALID_HANDLE_VALUE)return false;
     struct Inf{HINF h;~Inf(){SetupCloseInfFile(h);}} file{inf};INFCONTEXT line{};wchar_t value[512]{};
     if(!SetupFindFirstLineW(inf,L"Version",L"CatalogFile",&line)||!SetupGetStringFieldW(&line,1,value,512,nullptr)||_wcsicmp(value,L"TitanUserBackedDisk.cat"))return false;
     if(!SetupFindFirstLineW(inf,L"Version",L"Provider",&line)||!SetupGetStringFieldW(&line,1,value,512,nullptr)||_wcsicmp(value,L"Titanfyre"))return false;
     if(!SetupFindFirstLineW(inf,L"Install.NT.Services",L"AddService",&line)||!SetupGetStringFieldW(&line,1,value,512,nullptr)||_wcsicmp(value,L"TitanUserBackedDisk"))return false;
-    // SetupAPI expands DIRID13 to a source-relative path before staging.
-    if(!SetupFindFirstLineW(inf,L"Service",L"ServiceBinary",&line)||!SetupGetStringFieldW(&line,1,value,512,nullptr)||(_wcsicmp(value,L".\\TitanUserBackedDisk.sys")&&_wcsicmp(value,L"%13%\\TitanUserBackedDisk.sys")))return false;
+    if(!SetupFindFirstLineW(inf,L"Service",L"ServiceBinary",&line)||!SetupGetStringFieldW(&line,1,value,512,nullptr)||!OwnServiceBinary(source,value))return false;
     if(!SetupFindFirstLineW(inf,L"SourceDisksFiles",L"TitanUserBackedDisk.sys",&line))return false;
     if(!SetupFindFirstLineW(inf,L"Models.NTamd64.10.0...19041",nullptr,&line))return false;
     unsigned rows=0;
@@ -96,7 +108,7 @@ struct Temporary {
 Setup::Result Install(){
     Temporary temp;temp.Create();
     if(!OwnPackage(temp.directory/L"TitanUserBackedDisk.inf"))return {ERROR_INVALID_DATA,false,L"Installation refused: the embedded package does not match the exact Titan user-backed disk identity."};
-    if(!MicrosoftCatalog(temp.directory/L"TitanUserBackedDisk.cat"))return {ERROR_INVALID_IMAGE_HASH,false,L"Installation refused: the embedded driver catalog must have a trusted Microsoft Windows Hardware Compatibility Publisher signature. This preview has not completed Microsoft signing."};
+    if(!MicrosoftCatalog(temp.directory/L"TitanUserBackedDisk.cat"))return {ERROR_INVALID_IMAGE_HASH,false,L"Installation refused: the embedded driver catalog must have a trusted Microsoft Windows Hardware Compatibility Publisher signature."};
     if(!CatalogMember(temp.directory,L"TitanUserBackedDisk.inf")||!CatalogMember(temp.directory,L"TitanUserBackedDisk.sys"))return {ERROR_INVALID_IMAGE_HASH,false,L"Installation refused: the embedded INF or SYS is not a trusted member of its catalog."};
     Devices devices;devices.h=SetupDiGetClassDevsW(&GUID_DEVCLASS_SCSIADAPTER,nullptr,nullptr,0);Require(devices.h!=INVALID_HANDLE_VALUE);
     SP_DEVINFO_DATA selected{};selected.cbSize=sizeof(selected);bool found=false;
@@ -126,7 +138,7 @@ Setup::Result Uninstall(){
     // package-in-use failure after its device node had already been removed.
     wchar_t windows[MAX_PATH]{};DWORD length=GetWindowsDirectoryW(windows,MAX_PATH);Require(length>0&&length<MAX_PATH);
     fs::path infDirectory=fs::path(windows)/L"INF";
-    for(auto it=packages.begin();it!=packages.end();){if(!OwnPackage(infDirectory/(*it)))it=packages.erase(it);else ++it;}
+    for(const auto& inf:packages)if(!OwnPackage(infDirectory/inf))return {ERROR_INVALID_DATA,false,L"Uninstallation refused: the installed device's published INF does not match the exact product identity. No device or package was removed."};
     WIN32_FIND_DATAW entry{};HANDLE search=FindFirstFileW((infDirectory/L"oem*.inf").c_str(),&entry);
     if(search==INVALID_HANDLE_VALUE){if(GetLastError()!=ERROR_FILE_NOT_FOUND)Require(false);}
     else {

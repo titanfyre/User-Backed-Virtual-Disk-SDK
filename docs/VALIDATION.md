@@ -1,68 +1,31 @@
 # Validation and boundaries
 
-The public application/SDK is 0.1.0; the private driver candidate is 0.1.0.0.
-Windows x64 is the target. Microsoft signing and returned-package qualification
-remain pending. Source builds and offline tests are not substitutes for an
-installed storage-path test.
+Application/SDK **0.1.1**, Microsoft-signed driver **0.1.0.0**, Windows x64. The complete ZIP includes self-contained UI/console installers embedding the exact returned driver. Kernel implementation and signing material stay private.
 
-Completed offline checks: all five user-mode executables compile with MSVC
-W4/WX, CFG, ASLR, NX and static CRT. The normal and separate AddressSanitizer
-builds pass two CTest cases: 100,024 backend/boundary assertions, including
-100,000 independent arithmetic range cases, capacity checks, real memory and
-regular-file read/write/flush, and 10 read-only installer identity/signature
-refusal checks. Tests reject physical-device/UNC paths, DOS device names,
-alternate streams and trailing-dot/space aliases. They use temporary application
-image files. The recursion guard can enumerate PnP storage identities and query
-owned-disk/volume metadata;
-the offline tests create no virtual disk and read or write no raw disk data.
-No driver was installed on the development host.
+## Signed package identity
 
-The private candidate's static-analysis record has zero unwaived findings and
-one documented C28118 model waiver for an explicit zero-timeout process-object
-query at DISPATCH_LEVEL, following the [documented wait contract](https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-kewaitforsingleobject).
-That narrow documented exception does not replace
-runtime verification or imply a defect-free driver.
+The returned INF is byte-identical to the submission. Windows catalog hashing confirms that protected SYS content matches the qualified original image, apart from Authenticode exclusions. Microsoft kernel-policy catalog trust and exact INF/SYS membership were verified on the development host and again inside the guest. Both installers were inspected as PE resources without running host installer code; their three embedded files match the return exactly.
 
-The final-image Windows 10 x64 normal and targeted Driver Verifier campaigns
-each passed 1,036 native checks:
-exact owned-disk discovery, genuine signed authorization/refusal, 256 RAM-backed
-read/write roundtrips, eight regular-file-backed roundtrips, explicit storage
-flush, 64 concurrent submitted reads with 32 observed pending requests, bounded
-provider timeout, abrupt owner exit and permission expiry. All pending requests
-were released.
+- Original qualified SYS SHA-256: `1FEC9E50421701037F54B9B7668DA9DAE3BB8350CDD54D128D0A7F2182BBD301`.
+- Returned signed SYS SHA-256: `682b300bb4ed929c303465ad4d491803d80f1e3655a6d052dd1880ffefef79a1`.
+- No kernel rebuild, catalog regeneration, lab certificate or replacement driver was used for this return.
 
-In each campaign, a separate new 64 MiB owned RAM fixture was initialized as GPT
-with explicit 1 MiB partition alignment and quick-formatted as NTFS. Ordinary file creation,
-write-through write, explicit flush, close/reopen and independent byte/hash
-verification, rename/delete and flush/lock/dismount passed. An attempt to create
-an image on the SDK's own virtual disk was specifically refused before any image
-file was created. Selection required the exact product ancestry, size/sector and
-volume extents, with boot/system disks excluded. This was private guest-only
-qualification; the public app and examples still never autoformat a disk.
+## Actual signed Windows tests
 
-Both campaigns completed exact candidate package removal/unload, no new
-minidump and restoration of the designated guest. These are bounded tests on
-one controlled Windows 10 x64 guest, not a universal compatibility or production
-certification claim.
+On 2026-10-26, the exact returned image and complete console installer passed isolated **Windows 10 build 19045 x64** campaigns: normal: **1036 native checks**, targeted Driver Verifier: **1036 native checks**. Test-signing was explicitly disabled before installation. The guest's existing Secure Boot setting was preserved; Secure Boot/HVCI qualification is not claimed.
 
-The driver is not a boot/pagefile/storage replacement. The current limits are
-one dynamically attached synthetic disk with fixed-medium semantics,
-64 MiB..1 GiB, 512-byte sectors, 32 queued requests
-and 64 KiB transfers. One backend operation is issued at a time, preserving the
-write/flush order. Unsupported FUA/DPO and VERIFY requests are refused. File
-providers use write-through access and explicit flushes; this is not a power-loss
-or filesystem-recovery guarantee. Incomplete/late provider responses fail bounded operations;
-they do not create a persistence or recovery guarantee. Application callbacks
-must honor their own timeout, cancellation and non-reentrancy contract.
+Each campaign exercised genuine signed authorization and refusal, exact owned-disk discovery, 256 RAM-backed read/write roundtrips, eight regular-file-backed roundtrips, explicit storage flush, 64 concurrent submitted reads with 32 observed pending requests, bounded provider timeout, abrupt owner exit and permission expiry. All pending requests were released.
 
-Windows 11, Secure Boot/HVCI, additional filesystems and image recovery,
-representative storage/security filter coexistence, suspend/resume,
-long-duration pressure and throughput/latency benchmarks remain separately pending. Neither Microsoft
-signing nor a bounded VM pass means zero defects, universal compatibility or
-equivalence to existing production virtual-storage products.
+Each also passed six guarded filesystem checks on a separate new 64 MiB owned RAM fixture: GPT with 1 MiB alignment, quick NTFS formatting, file write/flush/close/reopen and independent byte/hash comparison, rename/delete, and flush/lock/dismount. An image backed by the SDK's own virtual disk was refused before file creation. Selection required exact product ancestry, size, sectors and volume extents, excluding boot/system disks. This was private guest qualification; public apps and examples never automatically initialize or format a disk.
 
-Private kernel sources, signing keys, runtime probes, lab certificates, PDBs and
-CABs are excluded from public downloads. A final submission freezes the exact
-qualified INF/SYS/CAT/PDB without rebuilding and verifies all bytes after CAB
-extraction. Returned Microsoft-signed packages need their own installation and
-runtime qualification before they become installable public bundles.
+Offline checks pass two CTest cases: 100,024 backend/independent-range assertions and 12 read-only installer identity/signature-refusal checks. The same updated sources also pass a separate AddressSanitizer build. The private driver has zero unwaived static findings and one documented C28118 model waiver for an explicit zero-timeout process-object query at DISPATCH_LEVEL under the [documented wait contract](https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-kewaitforsingleobject).
+
+The driver is not a boot/pagefile/storage replacement. It presents one dynamically attached disk with fixed-medium semantics, 64 MiB..1 GiB, 512-byte sectors, 32 queued requests and 64 KiB transfers. Backend operations are processed serially to preserve write/flush order. Unsupported FUA/DPO and VERIFY are refused. Write-through files and explicit flushes are not a power-loss/recovery guarantee. Callbacks must honor bounded timeout, cancellation and non-reentrancy. Custom/cloud/encrypted backends are integration possibilities rather than bundled implementations. The overflow refusal branch was not reached because Storport admitted at most 32 requests.
+
+Restricted-token control access, administrator zero/read-only/write-only opens and a second owner were refused. Actual console installation and uninstallation passed, every owned package was removed and all product/fixture services unloaded. No new minidump was observed. The VM returned to its original powered-off baseline with all nine historical checkpoints retained. No driver, certificate or host boot/device policy was installed or changed on the development PC.
+
+Standard Driver Verifier targeted only TitanUserBackedDisk.sys and TitanUSBTrace.sys in the signed campaigns. The independent Vdevice fixture and Windows drivers were not targeted. UI/console setups share an installation core; UI click automation is not claimed. User-mode builds use W4/WX, CFG, ASLR, NX and static CRT. Original InfVerif and submission evidence is preserved.
+
+Windows 11, Secure Boot/HVCI, physical USB/controllers, broader storage backends/filesystems, third-party filters, suspend/resume, surprise removal, low-resource simulation and prolonged pressure/performance benchmarks remain separate qualification work. Microsoft signing is not WHQL certification, zero overhead or a guarantee of defect-free/universal compatibility.
+
+Product-specific keys obtain signed per-handle permissions lasting at most one hour, explicitly renewable while enabled. Revocation refuses future grants; accepted permissions expire normally. No machine binding or automatic billing. Kernel sources, CABs, PDBs, private probes and signing credentials are excluded from public repositories/downloads.
