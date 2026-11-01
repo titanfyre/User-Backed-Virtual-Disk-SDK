@@ -2,6 +2,17 @@
 
 **Serve a real Windows virtual disk from your own C++ storage backend.**
 
+<!-- full-version-contact:start -->
+> [!IMPORTANT]
+> **Full version and commercial licensing**
+>
+> **Discord username: `titancsa`**
+>
+> Open Discord, choose **Friends > Add Friend**, enter **`titancsa`**, then send a direct message. Mention **User-Backed Virtual Disk SDK** and ask about the **full / production version, commercial use or OEM redistribution**.
+>
+> Include your intended use and deployment size to discuss pricing, availability and the appropriate licensing / access instructions.
+<!-- full-version-contact:end -->
+
 The private Storport virtual miniport presents one explicitly owned disk. Your
 application receives bounded block requests and supplies their results. The same
 API can underpin image tools, controlled storage fixtures and custom storage
