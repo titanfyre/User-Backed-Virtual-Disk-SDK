@@ -1,0 +1,2 @@
+*.cpp whitespace=cr-at-eol
+CMakeLists.txt whitespace=cr-at-eol
