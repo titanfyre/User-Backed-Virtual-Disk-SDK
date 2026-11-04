@@ -112,8 +112,14 @@ arbitrary application code or promise that a storage operation always completes.
 
 ## Build
 
+Demo/evaluation driver source is available; see [driver/README.md](driver/README.md) for
+build instructions and separate evaluation-source terms. Those terms apply to
+Titan-authored driver code. Third-party source licenses and existing application/SDK
+licenses remain applicable. Full/commercial implementation and private signing or
+activation material are excluded.
+
 Visual Studio 2022 Desktop C++, CMake and Windows SDK on x64 are sufficient for
-the public source; no WDK or private kernel source is required.
+the public source; no WDK or kernel-source build is required.
 
 ```powershell
 .\Build.ps1
@@ -142,8 +148,7 @@ remain until expiry, including the short challenge acceptance window. There is
 no TPM, machine binding, seat counter, payment collection or automatic billing.
 No HTTPS or signature work is repeated for every block request.
 
-Public app/SDK/examples/installer source is [MIT licensed](LICENSE). Private
-driver binaries have separate evaluation and production redistribution terms.
+Public app/SDK/examples/installer source is [MIT licensed](LICENSE). Prebuilt driver binaries have separate evaluation and production redistribution terms.
 Use only on systems and data you own or are authorized to administer. You are
 responsible for your deployment and data; software is provided without warranty,
 subject to the licenses and mandatory statutory rights. Microsoft signing alone
