@@ -1,0 +1,18 @@
+[build-system]
+requires=["setuptools>=77","wheel>=0.43"]
+build-backend="setuptools.build_meta"
+[project]
+name="user-backed-virtual-disk-sdk"
+version="1.0.0"
+description="Windows x64 User-Backed-Virtual-Disk-SDK direct SDK"
+requires-python=">=3.10"
+license="MIT"
+readme="README.md"
+[project.urls]
+Repository="https://github.com/titanfyre/User-Backed-Virtual-Disk-SDK"
+[tool.setuptools]
+packages=["user_backed_virtual_disk_sdk"]
+[tool.setuptools.package-data]
+user_backed_virtual_disk_sdk=["*.dll"]
+[tool.setuptools.data-files]
+"share/user-backed-virtual-disk-sdk/docs"=["docs/*","LICENSE"]

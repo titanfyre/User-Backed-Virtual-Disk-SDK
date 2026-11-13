@@ -1,0 +1,3 @@
+include README.md LICENSE
+recursive-include user_backed_virtual_disk_sdk *.py *.dll
+recursive-include docs *
