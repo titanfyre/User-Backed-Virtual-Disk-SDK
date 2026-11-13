@@ -68,6 +68,14 @@
       "distribution": "Documented native SDK; registry receipt tracked independently"
     },
     {
+      "directory": "User-Backed-Virtual-Disk-SDK-JavaScript-npm",
+      "language": "JavaScript",
+      "registry": "npm",
+      "name": "user-backed-virtual-disk-sdk",
+      "version": "1.0.0",
+      "distribution": "Documented native SDK; registry receipt tracked independently"
+    },
+    {
       "directory": "User-Backed-Virtual-Disk-SDK-NET-nuget",
       "language": "NET",
       "registry": "nuget",
