@@ -203,7 +203,7 @@
       "api_prefix": "user_backed_virtual_disk_sdk_json_"
     },
     "JavaScript/npm": {
-      "status": "awaiting_browser_publication_authentication",
+      "status": "registry_publication_requires_action",
       "name": "user-backed-virtual-disk-sdk",
       "version": "1.0.0",
       "directory": "User-Backed-Virtual-Disk-SDK-JavaScript-npm",
