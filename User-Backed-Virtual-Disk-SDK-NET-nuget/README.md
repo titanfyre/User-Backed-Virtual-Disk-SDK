@@ -1,8 +1,6 @@
 # User-Backed-Virtual-Disk-SDK .NET8 SDK
 
-Package ID `UserBackedVirtualDiskSDK.SDK`. NuGet upload remains on hold at owner request.
-
-```csharp
+Package ID `UserBackedVirtualDiskSDK.SDK`. ```csharp
 using var client=new TitanCSA.Products.UserBackedVirtualDiskSDK.Client();
 string statusJson=client.Call("status", "{}");
 ```
