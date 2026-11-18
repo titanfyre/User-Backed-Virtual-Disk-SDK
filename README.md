@@ -154,18 +154,18 @@ Les sources, licences, guides API et exemples sont regroupes dans [le depot SDK 
 | Conan | `user-backed-virtual-disk-sdk` | `conan install --requires=user-backed-virtual-disk-sdk/0.1.1 -r titancsa --build=missing -s compiler.cppstd=17` |
 | NuGet | `TitanCSA.UserBackedVirtualDisk.Native` | `Install-Package TitanCSA.UserBackedVirtualDisk.Native -Version 0.1.1` |
 | NuGet | `UserBackedVirtualDiskSDK.SDK` | `dotnet add package UserBackedVirtualDiskSDK.SDK --version 1.0.0` |
-| PyPI | `user_backed_virtual_disk_sdk` | Commande prevue apres publication : `python -m pip install user-backed-virtual-disk-sdk==1.0.0` |
+| PyPI | `user-backed-virtual-disk-sdk` | Commande prevue apres publication : `python -m pip install user-backed-virtual-disk-sdk==1.0.0` |
 | Conda | `user-backed-virtual-disk-sdk` | `conda install --override-channels -c https://raw.githubusercontent.com/TitanCSA/sdk-packages/089bc73095aa8eda89bacbe10d0b9e58394b0207/conda-channel -c conda-forge user-backed-virtual-disk-sdk` (canal TitanCSA) |
-| crates.io | `user_backed_virtual_disk_sdk` | `cargo add user-backed-virtual-disk-sdk@1.0.0` |
-| npm | `user_backed_virtual_disk_sdk` | Commande prevue apres publication : `npm install user-backed-virtual-disk-sdk@1.0.0` |
+| crates.io | `user-backed-virtual-disk-sdk` | `cargo add user-backed-virtual-disk-sdk@1.0.0` |
+| npm | `user-backed-virtual-disk-sdk` | Commande prevue apres publication : `npm install user-backed-virtual-disk-sdk@1.0.0` |
 | Maven Central | `io.github.titancsa:user-backed-virtual-disk-sdk` | `io.github.titancsa:user-backed-virtual-disk-sdk:1.0.0 (pom.xml / Gradle)` |
 | JitPack | `com.github.titanfyre:User-Backed-Virtual-Disk-SDK` | `com.github.titanfyre:User-Backed-Virtual-Disk-SDK:java-sdk-v1.0.0 (avec le depot JitPack)` |
 | Go Modules | `github.com/titanfyre/User-Backed-Virtual-Disk-SDK/User-Backed-Virtual-Disk-SDK-Go-modules` | `go get github.com/titanfyre/User-Backed-Virtual-Disk-SDK/User-Backed-Virtual-Disk-SDK-Go-modules@v1.0.0` |
 | pkg.go.dev | `github.com/titanfyre/User-Backed-Virtual-Disk-SDK/User-Backed-Virtual-Disk-SDK-Go-modules` | `Documentation : https://pkg.go.dev/github.com/titanfyre/User-Backed-Virtual-Disk-SDK/User-Backed-Virtual-Disk-SDK-Go-modules@v1.0.0` |
-| PowerShell Gallery | `user_backed_virtual_disk_sdk` | `Install-Module UserBackedVirtualDiskSDK -RequiredVersion 1.0.0 -Scope CurrentUser` |
+| PowerShell Gallery | `UserBackedVirtualDiskSDK` | `Install-Module UserBackedVirtualDiskSDK -RequiredVersion 1.0.0 -Scope CurrentUser` |
 | pub.dev | `user_backed_virtual_disk_sdk` | Commande prevue apres publication : `dart pub add user_backed_virtual_disk_sdk:1.0.0` |
-| RubyGems | `user_backed_virtual_disk_sdk` | `gem install user-backed-virtual-disk-sdk -v 1.0.0` |
-| Packagist | `user_backed_virtual_disk_sdk` | Commande prevue apres publication : `composer require titancsa/user-backed-virtual-disk-sdk:1.0.0` |
+| RubyGems | `user-backed-virtual-disk-sdk` | `gem install user-backed-virtual-disk-sdk -v 1.0.0` |
+| Packagist | `titancsa/user-backed-virtual-disk-sdk` | Commande prevue apres publication : `composer require titancsa/user-backed-virtual-disk-sdk:1.0.0` |
 
 Pour vcpkg et Conan, configure d abord le registre TitanCSA avec [le guide complet](https://github.com/TitanCSA/sdk-packages/tree/main/projects/User-Backed-Virtual-Disk-SDK/README.md). Le guide explique aussi Maven/Gradle, les prerequis et le chargement des DLL. Les pilotes/applications du produit sont installes separement. Les commandes marquees prevues ne sont pas encore disponibles.
 
